@@ -2,7 +2,7 @@ import pandas as pd
 
 
 def unique_values(df, columns):
-    return {column : df[column].drop_duplicates().to_json(orient='records') for column in columns}
+    return {column : df[column].drop_duplicates().values.tolist() for column in columns}
 
 
 def grid_values(df, request):
@@ -14,7 +14,6 @@ def expand_nodes(df, request):
     for rowGroup, groupKey in zip((f.get('field') for f in request.get('rowGroupCols')), request.get('groupKeys')):
         df = df.loc[df[rowGroup] == groupKey]
     return df
-
 
 
 def expand_nodes_query(df, request):

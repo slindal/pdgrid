@@ -18,8 +18,13 @@ def unique_values(request):
     request_body = json.loads(request.data)
     fields = request_body.get('fieldNames')
     df = load_dataframe(request_body)
-    return unique_values(df, fields)
-    
+    unique_values = unique_values(df, fields)
+
+    response = { 'message': "SUCCESS",
+                 'data': unique_values}
+
+    return jsonify(response)
+
 
 @app.route("/api/olympicWinners")
 def server():
