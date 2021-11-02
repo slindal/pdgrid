@@ -7,7 +7,13 @@ def unique_values(df, columns):
 
 def grid_values(df, request):
     df = expand_nodes(df, request)
-    return {'rows': df.to_dict(orient='records')}
+    df = aggregate(df, request)
+    lastRow = df.index.size
+    df = sort_and_paginate(df, request)
+    df = df[df.columns].astype(str) ## Looks like this is what is returned by laravel. Dubious. FIXME
+    return {'rows': df.to_dict(orient='records'),
+            'lastRow': lastRow
+            }
 
 
 def expand_nodes(df, request):
@@ -15,6 +21,25 @@ def expand_nodes(df, request):
         df = df.loc[df[rowGroup] == groupKey]
     return df
 
+
+def aggregate(df, request):
+    group_keys = request.get('groupKeys') or []
+    rowGroups = request.get('rowGroupCols') or []
+    aggFields = {f.get('field'): f.get('aggFunc') for f in request.get('valueCols')}
+    
+    if len(group_keys) < len(rowGroups):
+        df = df.groupby(rowGroups[len(group_keys)].get('field')).agg(aggFields).reset_index(drop=False)
+    return df
+    
+
+def sort_and_paginate(df, request):
+    if (sortModel := request.get('sortModel')):
+        df = df.sort_values(by=[f.get('colId') for f in sortModel], ascending=[f.get('sort') == 'asc' for f in sortModel])
+
+    start_row = request.get('startRow', 0)
+    end_row = request.get('endRow', 1000)
+    df = df.iloc[start_row:end_row]
+    return df
 
 def expand_nodes_query(df, request):
     '''uses df.query for filtering. Slower on simple operations?!
