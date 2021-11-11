@@ -6,6 +6,7 @@ def unique_values(df, columns):
 
 
 def grid_values(df, request):
+    df = process_filters(df, request)
     df = expand_nodes(df, request)
     df = aggregate(df, request)
     lastRow = df.index.size
@@ -16,6 +17,16 @@ def grid_values(df, request):
             }
 
 
+def process_filters(df, request):
+    for field, filter_options in request.get('filterModel', {}).items():
+        if filter_options.get('filterType') == 'set':
+            df = df[df[field].astype(str).isin(filter_options.get('values'))] ## This is a potential error source here! Why send it as string? FIXME
+        else:
+            raise Exception("Unimplemented filter type")
+        
+    return df
+
+        
 def expand_nodes(df, request):
     for rowGroup, groupKey in zip((f.get('field') for f in request.get('rowGroupCols')), request.get('groupKeys')):
         df = df.loc[df[rowGroup] == groupKey]

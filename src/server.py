@@ -1,39 +1,45 @@
-from flask import Flask, request, jsonify
-from src.pdgrid import unique_values, grid_values
 import json
 import pandas as pd
 
-app = Flask(__name__)
+from flask import Flask, request, jsonify
+from flask_socketio import SocketIO
+from flask_cors import CORS
 
+from src.pdgrid import unique_values, grid_values
+
+
+from flask import Flask
+app = Flask(__name__)
+from flaskext.mysql import MySQL
+
+CORS(app)
+
+mysql = MySQL()
+app.config['MYSQL_DATABASE_USER'] = 'root'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'grigri'
+app.config['MYSQL_DATABASE_DB'] = 'sample_data'
+app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+mysql.init_app(app)
+
+
+         
 
 def load_dataframe(dataset, request):
-    """ Stubbed loading from file. FIXME"""
-    jsons = json.loads(open('/home/slindal/dev/pdgrid/test/manual/olympic-winners.json').read())
-    df = pd.DataFrame(data=jsons)
+    conn = mysql.connect()
+    df = pd.read_sql_query("SELECT athlete, age, country, year, date, sport, gold, silver, bronze, total from athletes", conn)
     return df
 
 
-@app.route("/filter_values/{dataset}")
-def unique_values(request):
+@app.route("/api/<dataset>/", methods=['POST'])
+def server(dataset):
     request_body = json.loads(request.data)
-    fields = request_body.get('fieldNames')
-    df = load_dataframe(request_body)
-    unique_values = unique_values(df, fields)
-
-    response = { 'message': "SUCCESS",
-                 'data': unique_values}
-
-    return jsonify(response)
-
-
-@app.route("/api/olympicWinners")
-def server():
-    request_body = json.loads(request.data)
-    df = load_dataframe(None, request_body)
+    df = load_dataframe(dataset, request_body)
     data = grid_values(df, request_body)
+    return jsonify(data)
 
-    response = {'status': 0,
-                'message': "SUCCESS",
-                "data": data}
-    
-    return jsonify(response)
+
+@app.route("/api/<dataset>/<filter_field>/", methods=['GET'])
+def filter_field(dataset, filter_field):
+    df = load_dataframe(dataset, None)
+    data = df[filter_field].drop_duplicates().sort_values().astype(str).tolist()
+    return jsonify(data)

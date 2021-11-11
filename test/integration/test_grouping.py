@@ -39,8 +39,8 @@ def test_1(load_dataframe):
             "sortModel": []
         }'''
 
-        response = client.get('/api/olympicWinners', data= group_model)
-        rows = json.loads(response.data)['data']['rows']
+        response = client.post('/api/olympicWinners/', data= group_model)
+        rows = json.loads(response.data)['rows']
         assert(len(rows)) == 3
         assert(rows == [{'a': '4', 'b': '30', 'c': 'a'},
                         {'a': '2', 'b': '20', 'c': 'b'},
@@ -82,8 +82,8 @@ def test_2(load_dataframe):
             "sortModel": []
         }'''
 
-        response = client.get('/api/olympicWinners', data= group_model)
-        rows = json.loads(response.data)['data']['rows']
+        response = client.post('/api/olympicWinners/', data= group_model)
+        rows = json.loads(response.data)['rows']
         assert(len(rows)) == 1
         assert(rows == [{'a': '2', 'b': '20', 'c': 'b'}])
 
@@ -124,8 +124,8 @@ def test_3(load_dataframe):
             "sortModel": []
         }'''
 
-        response = client.get('/api/olympicWinners', data= group_model)
-        rows = json.loads(response.data)['data']['rows']
+        response = client.post('/api/olympicWinners/', data= group_model)
+        rows = json.loads(response.data)['rows']
         assert(len(rows)) == 2
         assert(rows ==  [{'a': '1', 'b': '10', 'c': 'a'}, {'a': '3', 'b': '20', 'c': 'a'}])
 
@@ -166,8 +166,8 @@ def test_4(load_dataframe):
             "sortModel": []
         }'''
 
-        response = client.get('/api/olympicWinners', data= group_model)
-        rows = json.loads(response.data)['data']['rows']
+        response = client.post('/api/olympicWinners/', data= group_model)
+        rows = json.loads(response.data)['rows']
         assert(len(rows)) == 1
         assert(rows ==  [{'a': '4', 'b': '30', 'd': 'aa'}])
 
@@ -208,8 +208,8 @@ def test_5(load_dataframe):
             "sortModel": []
         }'''
 
-        response = client.get('/api/olympicWinners', data= group_model)
-        rows = json.loads(response.data)['data']['rows']
+        response = client.post('/api/olympicWinners/', data= group_model)
+        rows = json.loads(response.data)['rows']
         assert(len(rows)) == 2
         assert(rows ==  [{'a': '1', 'b': '10', 'c': 'a', 'd': 'aa'},
                          {'a': '3', 'b': '20', 'c': 'a', 'd': 'aa'}])
