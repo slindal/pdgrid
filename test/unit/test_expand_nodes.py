@@ -1,5 +1,5 @@
 import pandas as pd
-from src.pdgrid import expand_nodes
+from pdgrid.pdgrid import expand_nodes
 
 
 def test_expand_nodes1():

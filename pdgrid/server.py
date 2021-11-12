@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify
 from flask_socketio import SocketIO
 from flask_cors import CORS
 
-from src.pdgrid import unique_values, grid_values
+from pdgrid.pdgrid import unique_values, grid_values
 
 
 from flask import Flask
@@ -16,7 +16,7 @@ CORS(app)
 
 mysql = MySQL()
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'grigri'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'PASSWORD'
 app.config['MYSQL_DATABASE_DB'] = 'sample_data'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
