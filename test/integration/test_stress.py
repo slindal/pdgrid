@@ -1,12 +1,12 @@
-from src.server import load_dataframe
-from src.server import app
+from pdgrid.server import load_dataframe
+from pdgrid.server import app
 from unittest import mock
 import pandas as pd
 import json
 import itertools
 
 
-@mock.patch('src.server.load_dataframe')
+@mock.patch('pdgrid.server.load_dataframe')
 def test_1(load_dataframe):
 
     groupkeys = ["".join(p) for p in itertools.product("AAABBCDE", repeat=6)]

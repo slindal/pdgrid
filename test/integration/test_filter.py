@@ -1,4 +1,4 @@
-from src.server import app
+from pdgrid.server import app
 from unittest import mock
 import pandas as pd
 import json
@@ -27,7 +27,6 @@ def test_1():
         }'''
 
         response = client.post('/api/olympicWinners/', data=group_model)
-        import ipdb; ipdb.set_trace()
         rows = json.loads(response.data)['rows']
         assert(len(rows)) == 5
         assert(rows ==  [{'country': 'Australia', 'gold': '0'}, {'country': 'China', 'gold': '3'}, {'country': 'Romania', 'gold': '5'}, {'country': 'South Korea', 'gold': '1'}, {'country': 'United States', 'gold': '4'}]

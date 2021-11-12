@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify
 from flask_socketio import SocketIO
 from flask_cors import CORS
 
-from src.pdgrid import unique_values, grid_values
+from pdgrid.pdgrid import unique_values, grid_values
 
 
 from flask import Flask

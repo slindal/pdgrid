@@ -1,10 +1,10 @@
-from src.server import load_dataframe
-from src.server import app
+from pdgrid.server import load_dataframe
+from pdgrid.server import app
 from unittest import mock
 import pandas as pd
 import json
 
-@mock.patch('src.server.load_dataframe')
+@mock.patch('pdgrid.server.load_dataframe')
 def test_1(load_dataframe):
     load_dataframe.return_value = pd.DataFrame(columns=['a', 'b', 'c'], data = [[1, 10, 'a'],
                                                                                 [2, 20, 'b'],
@@ -47,7 +47,7 @@ def test_1(load_dataframe):
                         {'a': '3', 'b': '30', 'c': 'c'}])
 
 
-@mock.patch('src.server.load_dataframe')
+@mock.patch('pdgrid.server.load_dataframe')
 def test_2(load_dataframe):
     load_dataframe.return_value = pd.DataFrame(columns=['a', 'b', 'c'], data = [[1, 10, 'a'],
                                                                                 [2, 20, 'b'],
@@ -89,7 +89,7 @@ def test_2(load_dataframe):
 
 
 
-@mock.patch('src.server.load_dataframe')
+@mock.patch('pdgrid.server.load_dataframe')
 def test_3(load_dataframe):
     load_dataframe.return_value = pd.DataFrame(columns=['a', 'b', 'c'], data = [[1, 10, 'a'],
                                                                                 [2, 20, 'b'],
@@ -130,7 +130,7 @@ def test_3(load_dataframe):
         assert(rows ==  [{'a': '1', 'b': '10', 'c': 'a'}, {'a': '3', 'b': '20', 'c': 'a'}])
 
 
-@mock.patch('src.server.load_dataframe')
+@mock.patch('pdgrid.server.load_dataframe')
 def test_4(load_dataframe):
     load_dataframe.return_value = pd.DataFrame(columns=['a', 'b', 'c', 'd'],
                                                data = [[1, 10, 'a', "aa"],
@@ -172,7 +172,7 @@ def test_4(load_dataframe):
         assert(rows ==  [{'a': '4', 'b': '30', 'd': 'aa'}])
 
 
-@mock.patch('src.server.load_dataframe')
+@mock.patch('pdgrid.server.load_dataframe')
 def test_5(load_dataframe):
     load_dataframe.return_value = pd.DataFrame(columns=['a', 'b', 'c', 'd'],
                                                data = [[1, 10, 'a', "aa"],

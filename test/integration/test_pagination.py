@@ -1,4 +1,4 @@
-from src.server import app
+from pdgrid.server import app
 import json
 
 
