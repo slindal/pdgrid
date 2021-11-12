@@ -1,8 +1,8 @@
 import pandas as pd
 
 
-def unique_values(df, columns):
-    return {column : df[column].drop_duplicates().values.tolist() for column in columns}
+def unique_values(df, filter_field):
+    return df[filter_field].drop_duplicates().sort_values().astype(str).tolist()
 
 
 def grid_values(df, request):
@@ -46,11 +46,11 @@ def aggregate(df, request):
 def sort_and_paginate(df, request):
     if (sortModel := request.get('sortModel')):
         df = df.sort_values(by=[f.get('colId') for f in sortModel], ascending=[f.get('sort') == 'asc' for f in sortModel])
-
     start_row = request.get('startRow', 0)
     end_row = request.get('endRow', 1000)
     df = df.iloc[start_row:end_row]
     return df
+
 
 def expand_nodes_query(df, request):
     '''uses df.query for filtering. Slower on simple operations?!
