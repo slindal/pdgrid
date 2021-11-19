@@ -49,7 +49,7 @@ def load_dataframe(dataset):
         return df
     
 
-@app.route("/api/<dataset>/", methods=['POST'])
+@app.route("/api/<dataset>", methods=['POST'])
 def server(dataset):
     request_body = json.loads(request.data)
     df = load_dataframe(dataset)
@@ -57,8 +57,9 @@ def server(dataset):
     return jsonify(data)
 
 
-@app.route("/api/<dataset>/<filter_field>/", methods=['GET'])
+@app.route("/api/<dataset>/<filter_field>", methods=['GET'])
 def filter_field(dataset, filter_field):
     df = load_dataframe(dataset)
     data = unique_values(df, filter_field)
     return jsonify(data)
+
