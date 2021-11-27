@@ -1,5 +1,5 @@
 from unittest import mock
-from pdgrid import grid_values
+from pdgrid import aggrid_values
 import pandas as pd
 import json
 
@@ -37,7 +37,7 @@ def test_1():
         "sortModel": []
     }
 
-    response = grid_values(df, request)
+    response = aggrid_values(df, request)
     rows = response['rows']
     assert(len(rows)) == 3
     assert(rows == [{'a': '4', 'b': '30', 'c': 'a'},
@@ -78,7 +78,7 @@ def test_2():
         "sortModel": []
     }
     
-    response = grid_values(df, request)
+    response = aggrid_values(df, request)
     rows = response['rows']
     assert(len(rows)) == 1
     assert(rows == [{'a': '2', 'b': '20', 'c': 'b'}])
@@ -118,7 +118,7 @@ def test_3():
         "sortModel": []
     }
 
-    response = grid_values(df, request)
+    response = aggrid_values(df, request)
     rows = response['rows']
     assert(len(rows)) == 2
     assert(rows ==  [{'a': '1', 'b': '10', 'c': 'a'}, {'a': '3', 'b': '20', 'c': 'a'}])
@@ -158,7 +158,7 @@ def test_4():
         "sortModel": []
     }
 
-    response = grid_values(df, request)
+    response = aggrid_values(df, request)
     rows = response['rows']
     assert(len(rows)) == 1
     assert(rows ==  [{'a': '4', 'b': '30', 'd': 'aa'}])
@@ -198,7 +198,7 @@ def test_5():
         "sortModel": []
     }
 
-    response = grid_values(df, request)
+    response = aggrid_values(df, request)
     rows = response['rows']
     assert(len(rows)) == 2
     assert(rows ==  [{'a': '1', 'b': '10', 'c': 'a', 'd': 'aa'},

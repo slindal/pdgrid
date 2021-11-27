@@ -1,4 +1,4 @@
-from pdgrid import unique_values, grid_values
+from pdgrid import unique_values, aggrid_values
 import pandas
 import json
 import itertools
@@ -26,7 +26,7 @@ def test_1():
             "sortModel": []
     }
 
-    response = grid_values(df, group_model)
+    response = aggrid_values(df, group_model)
     rows = response['rows']
     assert(len(rows)) == 5
     assert(rows ==  [{'country': 'Australia', 'gold': '0'}, {'country': 'China', 'gold': '3'}, {'country': 'Romania', 'gold': '5'}, {'country': 'South Korea', 'gold': '1'}, {'country': 'United States', 'gold': '4'}]
