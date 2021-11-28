@@ -8,7 +8,7 @@ from flask_cors import CORS
 from flask_caching import Cache
 from flask import current_app
 
-from pdgrid.pdgrid import unique_values, grid_values
+from pdgrid import unique_values, aggrid_values
 
 
 from flask import Flask
@@ -53,7 +53,7 @@ def load_dataframe(dataset):
 def server(dataset):
     request_body = json.loads(request.data)
     df = load_dataframe(dataset)
-    data = grid_values(df, request_body)
+    data = aggrid_values(df, request_body)
     return jsonify(data)
 
 
