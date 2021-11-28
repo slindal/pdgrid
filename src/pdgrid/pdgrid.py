@@ -26,6 +26,7 @@ def process_aggrid_request(df, request):
                        start_row,
                        end_row)
     
+
 def grid_values(df, groupby_columns, selected_groups, aggregation_params, filter_model, sort_fields, sort_ascending, start_row, end_row):
     df = process_filters(df, filter_model)
     df = expand_selected(df, groupby_columns, selected_groups)
@@ -44,16 +45,17 @@ def sort_and_aggregate(df, groupby_columns, selected_groups, aggregation_params,
     if aggregation_group:
         df = df.set_index(aggregation_group)
         last_row = df.index.nunique()
-        #Do we need to paginate?
-        if pagination := end_row < last_row or start_row > 0:
+
+        sort_agg_params = {f: ('min' if asc else 'max') for f, asc in zip(sort_fields, sort_ascending) if f not in aggregation_params and f != aggregation_group}
+        #Do we need to paginate or sort on non aggregated field?
+        if pagination := end_row < last_row or start_row > 0 or sort_agg_params:
                            
             if not sort_fields or sort_fields[0] == aggregation_group:
                 #only sort by group by column
                 ascending = True if not sort_fields else sort_ascending[0]
                 sorted_keys = df.index.drop_duplicates().sort_values(ascending=ascending)
             else:
-                sort_agg_params = {k:v for k,v in aggregation_params.items() if k in sort_fields}
-                sort_agg_params.update({f: ('min' if asc else 'max') for f, asc in zip(sort_fields, sort_ascending) if f not in sort_agg_params and f != aggregation_group})
+                sort_agg_params.update({k:v for k,v in aggregation_params.items() if k in sort_fields})
                 sorted_keys = (df.groupby(level=0)
                                .agg(sort_agg_params)
                                .sort_values(by=sort_fields,
@@ -61,12 +63,12 @@ def sort_and_aggregate(df, groupby_columns, selected_groups, aggregation_params,
                                ).index
         
             sorted_keys = sorted_keys[start_row:end_row]
-            df = df.loc[sorted_keys]
+            df = df.loc[sorted_keys] #Filter out unneded groups
+
 
         df = df.groupby(level=0).agg(aggregation_params)
         if pagination:
-            df = df.loc[sorted_keys]
-
+            df = df.loc[sorted_keys] #Group by scrambles order, resort
         df = df.reset_index(drop=False)
 
     if not aggregation_group or not pagination:
