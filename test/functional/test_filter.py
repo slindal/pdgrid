@@ -39,3 +39,160 @@ def test_filterendpoint():
     response = unique_values(df, 'age')
     assert(response == ['15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '37', '41'])
     
+
+
+def test_text_filter_contains():
+    df = pandas.DataFrame(columns=['a', 'b', 'c'], data = [['aaa', 'bbb', 'ccc'],
+                                                             ['aba', 'bba', 'cca'],
+                                                             ['abb', 'baa', 'cbb']])
+
+    request = {
+            "startRow": 0,
+            "endRow": 100,
+            "rowGroupCols": [],
+            "valueCols": [],
+            "pivotCols": [],
+            "pivotMode": False,
+            "groupKeys": [],
+            "filterModel": {"a": {"filterType": "text", "type": "contains", "filter": "ab"}},
+            "sortModel": []
+    }
+
+    response = aggrid_values(df, request)
+    assert(response == {'rows': [{'a': 'aba', 'b': 'bba', 'c': 'cca'}, {'a': 'abb', 'b': 'baa', 'c': 'cbb'}], 'lastRow': 2})
+ 
+    
+def test_text_filter_not_contains():
+    df = pandas.DataFrame(columns=['a', 'b', 'c'], data = [['aaa', 'bbb', 'ccc'],
+                                                             ['aba', 'bba', 'cca'],
+                                                             ['abb', 'baa', 'cbb']])
+
+    request = {
+            "startRow": 0,
+            "endRow": 100,
+            "rowGroupCols": [],
+            "valueCols": [],
+            "pivotCols": [],
+            "pivotMode": False,
+            "groupKeys": [],
+            "filterModel": {"a": {"filterType": "text", "type": "notContains", "filter": "ab"}},
+            "sortModel": []
+    }
+
+    response = aggrid_values(df, request)
+    assert(response == {'rows': [{'a': 'aaa', 'b': 'bbb', 'c': 'ccc'}], 'lastRow': 1})
+
+ 
+def test_text_filter_equals():
+    df = pandas.DataFrame(columns=['a', 'b', 'c'], data = [['aaa', 'bbb', 'ccc'],
+                                                             ['aba', 'bba', 'cca'],
+                                                             ['abb', 'baa', 'cbb']])
+
+    request = {
+            "startRow": 0,
+            "endRow": 100,
+            "rowGroupCols": [],
+            "valueCols": [],
+            "pivotCols": [],
+            "pivotMode": False,
+            "groupKeys": [],
+            "filterModel": {"a": {"filterType": "text", "type": "equals", "filter": "abb"}},
+            "sortModel": []
+    }
+
+    response = aggrid_values(df, request)
+    assert(response == {'rows': [{'a': 'abb', 'b': 'baa', 'c': 'cbb'}], 'lastRow': 1})
+    
+def test_text_filter_not_equals():
+    df = pandas.DataFrame(columns=['a', 'b', 'c'], data = [['aaa', 'bbb', 'ccc'],
+                                                             ['aba', 'bba', 'cca'],
+                                                             ['abb', 'baa', 'cbb']])
+
+    request = {
+            "startRow": 0,
+            "endRow": 100,
+            "rowGroupCols": [],
+            "valueCols": [],
+            "pivotCols": [],
+            "pivotMode": False,
+            "groupKeys": [],
+            "filterModel": {"a": {"filterType": "text", "type": "notEquals", "filter": "abb"}},
+            "sortModel": []
+    }
+
+    response = aggrid_values(df, request)
+    assert(response == {'rows': [{'a': 'aaa', 'b': 'bbb', 'c': 'ccc'}, {'a': 'aba', 'b': 'bba', 'c': 'cca'}], 'lastRow': 2})
+
+    
+def test_text_filter_startwith():
+    df = pandas.DataFrame(columns=['a', 'b', 'c'], data = [['aaa', 'bbb', 'ccc'],
+                                                             ['aba', 'bba', 'cca'],
+                                                             ['abb', 'baa', 'cbb']])
+
+    request = {
+            "startRow": 0,
+            "endRow": 100,
+            "rowGroupCols": [],
+            "valueCols": [],
+            "pivotCols": [],
+            "pivotMode": False,
+            "groupKeys": [],
+            "filterModel": {"a": {"filterType": "text", "type": "startsWith", "filter": "ab"}},
+            "sortModel": []
+    }
+
+    response = aggrid_values(df, request)
+    assert(response == {'rows': [{'a': 'aba', 'b': 'bba', 'c': 'cca'}, {'a': 'abb', 'b': 'baa', 'c': 'cbb'}], 'lastRow': 2})
+
+def test_text_filter_endswith():
+    df = pandas.DataFrame(columns=['a', 'b', 'c'], data = [['aaa', 'bbb', 'ccc'],
+                                                             ['aba', 'bba', 'cca'],
+                                                             ['abb', 'baa', 'cbb']])
+
+    request = {
+            "startRow": 0,
+            "endRow": 100,
+            "rowGroupCols": [],
+            "valueCols": [],
+            "pivotCols": [],
+            "pivotMode": False,
+            "groupKeys": [],
+            "filterModel": {"a": {"filterType": "text", "type": "endsWith", "filter": "bb"}},
+            "sortModel": []
+    }
+
+    response = aggrid_values(df, request)
+    assert(response == {'rows': [{'a': 'abb', 'b': 'baa', 'c': 'cbb'}], 'lastRow': 1})
+
+
+def test_multi_filter():
+
+    df = pandas.DataFrame(columns=['a', 'b', 'c'], data = [['aaa', 'bbb', 'ccc'],
+                                                             ['aba', 'bba', 'cca'],
+                                                             ['abb', 'baa', 'cbb']])
+
+    request = {
+        "startRow": 0,
+        "endRow": 100,
+        "rowGroupCols": [],
+        "valueCols": [],
+        "pivotCols": [],
+        "pivotMode": False,
+        "groupKeys": [],
+        "filterModel": {
+            "a": {
+                "filterType":"text",
+                "operator":"OR",
+                "condition1": {"filterType": "text", "type": "endsWith", "filter": "ba"},
+                "condition2": {"filterType": "text", "type": "endsWith", "filter": "aa"},
+            }
+        },                                  
+        "sortModel": []
+    }
+
+    response = aggrid_values(df, request)
+    assert(response == {'rows': [{'a': 'aaa', 'b': 'bbb', 'c': 'ccc'}, {'a': 'aba', 'b': 'bba', 'c': 'cca'}], 'lastRow': 2})
+
+
+
+    
