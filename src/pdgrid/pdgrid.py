@@ -3,19 +3,59 @@ import operator
 import functools
 
 
+PDGRID_FILTERS = {
+    ('set', None): lambda column, filter_value: column.astype(str).isin(filter_value),
+    ('text', 'contains'): lambda column, filter_value: column.str.contains(filter_value),
+    ('text', 'notContains'): lambda column, filter_value: ~column.str.contains(filter_value),
+    ('text', 'equals'): operator.eq,
+    ('text', 'notEquals'): lambda column, filter_value: column != filter_value,
+    ('text', 'startsWith'): lambda column, filter_value: column.str.startswith(filter_value),
+    ('text', 'endsWith'): lambda column, filter_value: column.str.endswith(filter_value),
+    ('number', 'lessThanOrEqual'): operator.le,
+    ('number', 'lessThan'): operator.lt,
+    ('number', 'equals'): operator.eq,
+    ('number', 'notEquals'): operator.ne,
+    ('number', 'greaterThan'): operator.gt,
+    ('number', 'greaterThanOrEqual'): operator.ge,
+}
+
+
 def unique_values(df, filter_field):
-    return df[filter_field].drop_duplicates().sort_values().astype(str).tolist()
+    return df[filter_field].drop_duplicates().sort_values().tolist()
 
 
+class column_filter(functools.partial):
+    '''Like partial, but allow to pass in leftmost argument last'''
+    def __call__(self, column):
+        return self.func(column, *self.args)
 
 
+def operator_processor(column, operator_func, filter1, filter2):
+    '''Combine the output of two column filters using the operator (OR, AND) passed in'''
+    return operator_func(filter1(column), filter2(column))
+
+    
 def process_aggrid_request(df, request):
+    '''Take in json from aggrid and extract parameters for processing'''
     operator_map = {'OR': operator.or_,
                     'AND': operator.and_}
 
-    def filter_to_func(ag_filter):
-        return functools.partial(filters[(ag_filter['filterType'], ag_filter.get('type'))], ag_filter.get('values' if ag_filter['filterType'] == 'set' else 'filter'))
-    
+    def agfilter_to_func(f):
+        if 'operator' in f:
+            return column_filter(operator_processor,
+                            operator_map[f['operator']],
+                            agfilter_to_func(f.get('condition1')),
+                            agfilter_to_func(f.get('condition2'))
+                            )
+        elif f.get('filterType') == 'number' and f.get('type') == 'inRange':
+            return column_filter(operator_processor,
+                            operator_map['AND'],
+                            column_filter(PDGRID_FILTERS[('number', 'greaterThanOrEqual')], f.get('filter')),
+                            column_filter(PDGRID_FILTERS[('number', 'lessThan')], f.get('filterTo'))
+                            )
+        else:
+            return column_filter(PDGRID_FILTERS[(f['filterType'], f.get('type'))], f.get('values' if f['filterType'] == 'set' else 'filter'))
+        
     groupby_columns = [f.get('field') for f in request.get('rowGroupCols', [])]
     aggregation_params = {f.get('field'): f.get('aggFunc') for f in request.get('valueCols') if f.get('aggFunc') is not None and f.get('field') is not None}
 
@@ -25,24 +65,12 @@ def process_aggrid_request(df, request):
     filter_model = {}
 
     for field, f in request.get('filterModel', {}).items():
-        if 'operator' in f:
-            filter_model[field] = functools.partial(operator_processor,
-                                                    operator_map[f['operator']],
-                                                    filter_to_func(f.get('condition1')),
-                                                    filter_to_func(f.get('condition2'))
-                                                    )
-        else:
-            filter_model[field] = functools.partial(filter_to_func(f))
-            
-            
-        #     ['operator', f.get('operator'),
-        #                            [(condition1.get('filterType'), condition1.get('type'), condition1.get('filter')),
-        #                             (condition2.get('filterType'), condition2.get('type'), condition2.get('filter'))]
-        #                            ]
-        # else:
-        #     filter_model[field] = (f.get('filterType'), f.get('type'), f.get('values') if f.get('filterType') == 'set' else f.get('filter'))
-                                   
-#        field: (f.get('filterType'), f.get('type') if not operator in f else 'operator', f.get('values') if f.get('filterType') == 'set' else f.get('filter')) for field,f in request.get('filterModel', {}).items()}
+        filter_model[field] = agfilter_to_func(f)
+
+    #Expanding a group is essentially a single value filter
+    for field, filter_value in zip(groupby_columns, selected_groups):
+        filter_model[field] = column_filter(operator.eq, filter_value)
+        
     start_row = request.get('startRow') or 0
     end_row = request.get('endRow') or 200
 
@@ -59,9 +87,8 @@ def process_aggrid_request(df, request):
 
 def grid_values(df, groupby_columns, selected_groups, aggregation_params, filter_model, sort_fields, sort_ascending, start_row, end_row):
     df = process_filters(df, filter_model)
-    df = expand_selected(df, groupby_columns, selected_groups)
     df, last_row = sort_and_aggregate(df, groupby_columns, selected_groups, aggregation_params, sort_fields, sort_ascending, start_row, end_row)
-    df = df[df.columns].astype(str) ## Looks like this is what is returned by laravel. Dubious. FIXME
+    df = df[df.columns]
     return {'rows': df.to_dict(orient='records'),
             'lastRow': last_row
             }
@@ -108,32 +135,11 @@ def sort_and_aggregate(df, groupby_columns, selected_groups, aggregation_params,
 
     return df, last_row
 
-def operator_processor(operator_func, filter1, filter2, df):
-    return operator_func(filter1(df), filter2(df))
-
-filters = {
-    ('set', None): lambda filter_value, df: df.astype(str).isin(filter_value),
-    ('text', 'contains'): lambda filter_value, df: df.str.contains(filter_value),
-    ('text', 'notContains'): lambda filter_value, df: ~df.str.contains(filter_value),
-    ('text', 'equals'): operator.eq,
-    ('text', 'notEquals'): lambda filter_value, df: df != filter_value,
-    ('text', 'startsWith'): lambda filter_value, df: df.str.startswith(filter_value),
-    ('text', 'endsWith'): lambda filter_value, df: df.str.endswith(filter_value)
-}
-
-
-def combined_filter(operator_toapply, filter1, filter2, df):
-    return operator_toapply(filter1(df), filter2(df))
 
 def process_filters(df, filter_model):
+    '''This could possibly be done with df.query, but unclear if it would be faster'''
     for field, filter_function in filter_model.items():
         df = df.loc[filter_function(df[field])]
-    return df
-
-
-def expand_selected(df, groupby_columns, selected_groups):
-    for groupby_column, selected_group in zip(groupby_columns, selected_groups):
-        df = df.loc[df[groupby_column] == selected_group]
     return df
 
 
