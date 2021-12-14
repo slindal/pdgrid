@@ -1,0 +1,7 @@
+flask
+flask-cors
+flask-caching
+flask-mysql
+redis
+pyarrow
+
