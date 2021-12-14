@@ -40,9 +40,9 @@ def test_1():
     response = aggrid_values(df, request)
     rows = response['rows']
     assert(len(rows)) == 3
-    assert(rows == [{'a': '4', 'b': '30', 'c': 'a'},
-                    {'a': '2', 'b': '20', 'c': 'b'},
-                    {'a': '3', 'b': '30', 'c': 'c'}])
+    assert(rows == [{'a': 4, 'b': 30, 'c': 'a'},
+                    {'a': 2, 'b': 20, 'c': 'b'},
+                    {'a': 3, 'b': 30, 'c': 'c'}])
     
     
 def test_2():
@@ -81,7 +81,7 @@ def test_2():
     response = aggrid_values(df, request)
     rows = response['rows']
     assert(len(rows)) == 1
-    assert(rows == [{'a': '2', 'b': '20', 'c': 'b'}])
+    assert(rows == [{'a': 2, 'b': 20, 'c': 'b'}])
     
 
 
@@ -121,7 +121,7 @@ def test_3():
     response = aggrid_values(df, request)
     rows = response['rows']
     assert(len(rows)) == 2
-    assert(rows ==  [{'a': '1', 'b': '10', 'c': 'a'}, {'a': '3', 'b': '20', 'c': 'a'}])
+    assert(rows ==  [{'a': 1, 'b': 10, 'c': 'a'}, {'a': 3, 'b': 20, 'c': 'a'}])
     
 
 def test_4():
@@ -161,7 +161,7 @@ def test_4():
     response = aggrid_values(df, request)
     rows = response['rows']
     assert(len(rows)) == 1
-    assert(rows ==  [{'a': '4', 'b': '30', 'd': 'aa'}])
+    assert(rows ==  [{'a': 4, 'b': 30, 'd': 'aa'}])
 
 
 def test_5():
@@ -201,6 +201,6 @@ def test_5():
     response = aggrid_values(df, request)
     rows = response['rows']
     assert(len(rows)) == 2
-    assert(rows ==  [{'a': '1', 'b': '10', 'c': 'a', 'd': 'aa'},
-                     {'a': '3', 'b': '20', 'c': 'a', 'd': 'aa'}])
+    assert(rows ==  [{'a': 1, 'b': 10, 'c': 'a', 'd': 'aa'},
+                     {'a': 3, 'b': 20, 'c': 'a', 'd': 'aa'}])
     

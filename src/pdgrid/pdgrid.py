@@ -34,56 +34,6 @@ def operator_processor(column, operator_func, filter1, filter2):
     '''Combine the output of two column filters using the operator (OR, AND) passed in'''
     return operator_func(filter1(column), filter2(column))
 
-    
-def process_aggrid_request(df, request):
-    '''Take in json from aggrid and extract parameters for processing'''
-    operator_map = {'OR': operator.or_,
-                    'AND': operator.and_}
-
-    def agfilter_to_func(f):
-        if 'operator' in f:
-            return column_filter(operator_processor,
-                            operator_map[f['operator']],
-                            agfilter_to_func(f.get('condition1')),
-                            agfilter_to_func(f.get('condition2'))
-                            )
-        elif f.get('filterType') == 'number' and f.get('type') == 'inRange':
-            return column_filter(operator_processor,
-                            operator_map['AND'],
-                            column_filter(PDGRID_FILTERS[('number', 'greaterThanOrEqual')], f.get('filter')),
-                            column_filter(PDGRID_FILTERS[('number', 'lessThan')], f.get('filterTo'))
-                            )
-        else:
-            return column_filter(PDGRID_FILTERS[(f['filterType'], f.get('type'))], f.get('values' if f['filterType'] == 'set' else 'filter'))
-        
-    groupby_columns = [f.get('field') for f in request.get('rowGroupCols', [])]
-    aggregation_params = {f.get('field'): f.get('aggFunc') for f in request.get('valueCols') if f.get('aggFunc') is not None and f.get('field') is not None}
-
-    selected_groups = request.get('groupKeys', [])
-    sort_fields = [f.get('colId') for f in request.get('sortModel', []) if f.get('colId') not in groupby_columns[:len(selected_groups)]]
-    sort_ascending = [f.get('sort') == 'asc' for f in request.get('sortModel', []) if f.get('colId') not in groupby_columns[:len(selected_groups)]]
-    filter_model = {}
-
-    for field, f in request.get('filterModel', {}).items():
-        filter_model[field] = agfilter_to_func(f)
-
-    #Expanding a group is essentially a single value filter
-    for field, filter_value in zip(groupby_columns, selected_groups):
-        filter_model[field] = column_filter(operator.eq, filter_value)
-        
-    start_row = request.get('startRow') or 0
-    end_row = request.get('endRow') or 200
-
-    return grid_values(df,
-                       groupby_columns,
-                       selected_groups,
-                       aggregation_params,
-                       filter_model,
-                       sort_fields,
-                       sort_ascending,
-                       start_row,
-                       end_row)
-
 
 def grid_values(df, groupby_columns, selected_groups, aggregation_params, filter_model, sort_fields, sort_ascending, start_row, end_row):
     df = process_filters(df, filter_model)
@@ -92,7 +42,6 @@ def grid_values(df, groupby_columns, selected_groups, aggregation_params, filter
     return {'rows': df.to_dict(orient='records'),
             'lastRow': last_row
             }
-
 
 
 def sort_and_aggregate(df, groupby_columns, selected_groups, aggregation_params, sort_fields, sort_ascending, start_row, end_row):
@@ -143,24 +92,57 @@ def process_filters(df, filter_model):
     return df
 
 
-def aggregate(df, request):
-    group_keys = request.get('groupKeys') or []
-    rowGroups = request.get('rowGroupCols') or []
-    if len(group_keys) < len(rowGroups):
+def process_aggrid_request(df, request):
+    '''AG-Grid specific transform function
+    Take in json from aggrid and extract parameters needed to decide how to transform'''
+    operator_map = {'OR': operator.or_,
+                    'AND': operator.and_}
 
+    agg_lookup = {
+        'avg': 'mean'
+    }
 
-        aggFields = {f.get('field'): f.get('aggFunc') for f in request.get('valueCols')}
+    def agfilter_to_func(f):
+        if 'operator' in f:
+            return column_filter(operator_processor,
+                            operator_map[f['operator']],
+                            agfilter_to_func(f.get('condition1')),
+                            agfilter_to_func(f.get('condition2'))
+                            )
+        elif f.get('filterType') == 'number' and f.get('type') == 'inRange':
+            return column_filter(operator_processor,
+                            operator_map['AND'],
+                            column_filter(PDGRID_FILTERS[('number', 'greaterThanOrEqual')], f.get('filter')),
+                            column_filter(PDGRID_FILTERS[('number', 'lessThan')], f.get('filterTo'))
+                            )
+        else:
+            return column_filter(PDGRID_FILTERS[(f['filterType'], f.get('type'))], f.get('values' if f['filterType'] == 'set' else 'filter'))
+        
+    groupby_columns = [f.get('field') for f in request.get('rowGroupCols', [])]
+    aggregation_params = {f.get('field'): agg_lookup.get(f.get('aggFunc'), f.get('aggFunc')) for f in request.get('valueCols') if f.get('aggFunc') is not None and f.get('field') is not None}
 
-        df = df.groupby(rowGroups[len(group_keys)].get('field')).agg(aggFields).reset_index(drop=False)
-    return df
+    selected_groups = request.get('groupKeys', [])
+    sort_fields = [f.get('colId') for f in request.get('sortModel', []) if f.get('colId') not in groupby_columns[:len(selected_groups)]]
+    sort_ascending = [f.get('sort') == 'asc' for f in request.get('sortModel', []) if f.get('colId') not in groupby_columns[:len(selected_groups)]]
+    filter_model = {}
 
+    for field, f in request.get('filterModel', {}).items():
+        filter_model[field] = agfilter_to_func(f)
 
-def expand_nodes_query(df, request):
-    '''uses df.query for filtering. Slower on simple operations?!
+    #Expanding a group is essentially a single value filter
+    for field, filter_value in zip(groupby_columns, selected_groups):
+        filter_model[field] = column_filter(operator.eq, filter_value)
+        
+    start_row = request.get('startRow') or 0
+    end_row = request.get('endRow') or 200
 
-    also needs strings to be backticked
-    '''
-    if request.get('groupKeys'):
-        group_filters = " and ".join("{} == {}".format(rowGroup, value) for rowGroup,value in zip((f.get('field') for f in request.get('rowGroupCols')), request.get('groupKeys')))
-        df = df.query(group_filters)
-    return df
+    return grid_values(df,
+                       groupby_columns,
+                       selected_groups,
+                       aggregation_params,
+                       filter_model,
+                       sort_fields,
+                       sort_ascending,
+                       start_row,
+                       end_row)
+
