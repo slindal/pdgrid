@@ -8,7 +8,7 @@ PDGRID_FILTERS = {
     ('text', 'contains'): lambda column, filter_value: column.str.contains(filter_value),
     ('text', 'notContains'): lambda column, filter_value: ~column.str.contains(filter_value),
     ('text', 'equals'): operator.eq,
-    ('text', 'notEquals'): lambda column, filter_value: column != filter_value,
+    ('text', 'notEquals'): operator.ne,
     ('text', 'startsWith'): lambda column, filter_value: column.str.startswith(filter_value),
     ('text', 'endsWith'): lambda column, filter_value: column.str.endswith(filter_value),
     ('number', 'lessThanOrEqual'): operator.le,
@@ -134,7 +134,7 @@ def process_aggrid_request(df, request):
         filter_model[field] = column_filter(operator.eq, filter_value)
         
     start_row = request.get('startRow') or 0
-    end_row = request.get('endRow') or 200
+    end_row = request.get('endRow') or 100
 
     return grid_values(df,
                        groupby_columns,
