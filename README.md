@@ -1,6 +1,8 @@
 # This package provides an api for a grid front end to request transformed and aggregated data sets.
-It is built around handling the requests from an ag-grid front end client, but cold easily be generalized to handle requests from other front ends. 
+It is built around handling the requests from an ag-grid front end client, but could easily be generalized to handle requests from other front ends. 
 
+## Requirements
+Python 3.7 < 3.10 (tested with 3.8 and 3.9). Does not work with 3.10 as numpy build still hasn't been released for 3.10.
  
 ## Installation:
 from source:
@@ -16,12 +18,12 @@ pip install pdgrid
 ## Running an example server
 The example server provided is set up to be a python version of the laravel server provided here: (https://github.com/shuheb/ag-grid-angular-laravel-mysql).
 
-Follow the steps in that example to set up a working front end client and to create a mysql database.
-
 Assuming you have a mysql server set up with a database called sample_data create and populate the tables with:
 ```bash
 $ cd examples
-$ mysql -u user -p < create_athletes.sql
+$ msyql -u root
+$ mysql> create database sample_data
+$ mysql> source ./create_athletes.sql
 ```
 
 Install the python packages needed to run the server:
@@ -36,14 +38,14 @@ $ export FLASK_APP=server
 $ python -m flask run --port=8000
 ```
 
-If you have started up the front end client from the laravel example you should be able to see data at http://localhost:4200/
+If you have started up the front end client (follow readme here: https://github.com/shuheb/ag-grid-angular-laravel-mysql/blob/main/client/README.md) from the laravel example you should be able to see data at http://localhost:4200/
 
 ## Using other data
-In order to serve another dataset you just have to provide a different loading function for the data. No other changes will be necessary on the pdgrid side, provided you have updated the front end server to request the corresponding data set.
+In order to serve another dataset you just have to provide a different loading function for the data. No other changes will be necessary on the pdgrid side, provided you have updated the front end client to request the corresponding data set.
 
 ## What is not supported
 
-The pivod featere has not yet been implemented.
+The pivot featere has not yet been implemented.
 
 
 

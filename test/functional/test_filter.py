@@ -2,10 +2,13 @@ from pdgrid import unique_values, aggrid_values
 import pandas
 import json
 import itertools
+import os
 
-def test_1():
 
-    df = pandas.read_json("/home/slindal/dev/pdgrid/test/manual/olympic-winners.json")
+def test_set():
+
+    dirname = os.path.dirname(__file__)
+    df = pandas.read_json(os.path.join(dirname, "olympic-winners.json"))
 
     group_model = {
             "startRow": 0,
@@ -32,12 +35,6 @@ def test_1():
     assert(rows ==  [{'country': 'Australia', 'gold': 0}, {'country': 'China', 'gold': 3}, {'country': 'Romania', 'gold': 5}, {'country': 'South Korea', 'gold': 1}, {'country': 'United States', 'gold': 4}]
 )
 
-
-def test_filterendpoint():
-    df = pandas.read_json("/home/slindal/dev/pdgrid/test/manual/olympic-winners.json")
-    response = unique_values(df, 'age')
-    assert(response == [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 37, 41])
-    
 
 def test_text_filter_contains():
     df = pandas.DataFrame(columns=['a', 'b', 'c'], data = [['aaa', 'bbb', 'ccc'],

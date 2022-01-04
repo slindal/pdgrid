@@ -1,10 +1,12 @@
 import json
 import pandas
+import os
 from unittest import mock, TestCase
-
 from pdgrid import aggrid_values
 
-df = pandas.read_json("/home/slindal/dev/pdgrid/test/manual/olympic-winners.json")
+
+dirname = os.path.dirname(__file__)
+df = pandas.read_json(os.path.join(dirname, "olympic-winners.json"))
 
 
 def test_no_grouping_or_sorting():
