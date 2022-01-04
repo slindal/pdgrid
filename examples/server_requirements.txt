@@ -4,4 +4,4 @@ flask-caching
 flask-mysql
 redis
 pyarrow
-
+cryptography
