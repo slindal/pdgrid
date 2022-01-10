@@ -1,3 +1,19 @@
+Metadata-Version: 2.1
+Name: pdgrid
+Version: 0.1.5
+Summary: An interface to pandas for grid data server.
+Home-page: https://github.com/slindal/pdgrid
+Author: Svein Lindal
+Author-email: svein.lindal@gmail.com
+License: UNKNOWN
+Project-URL: Bug Tracker, https://github.com/slindal/pdgrid/issues
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: <=3.9,>=3.7
+Description-Content-Type: text/markdown
+
 # This package provides  an api for a grid front end to request transformed and aggregated data sets.
 
 The api is written generically so that one server can handle multiple different data sets without any modifications beyond how the data is loaded from the database (or otherwise). It is built around handling the requests from an [ag-grid](https://www.ag-grid.com/) front end client, but could easily be generalized to handle requests from other front ends.
@@ -10,7 +26,7 @@ The source code is available [here](https://github.com/slindal/pdgrid/tree/main/
 Pagination, Grouping, Sorting, Aggregrations, Asynchronous fetching of set filter values, Filtering (text, numbers, text sets. Not datetype at the moment), 
 
 ## Requirements
-Python 3.8 or 3.9.
+Python 3.7, 3.8 or 3.9 (tested with 3.8 and 3.9). Does not work with 3.10 as numpy build still hasn't been released for 3.10.
 
 ## Installation:
 
@@ -54,3 +70,5 @@ If you have started up the front end client (follow readme here: https://github.
 
 ## Using other data
 In order to serve another dataset you just have to provide a different loading function for the data. No other changes will be necessary on the server side, provided you have updated the front end client to request the corresponding data set.
+
+
