@@ -21,6 +21,7 @@ PDGRID_FILTERS = {
 
 
 def unique_values(df, filter_field):
+    '''Endpoint that provides a distinct list of values in a column, used by the front end for filtering'''
     return df[filter_field].drop_duplicates().sort_values().tolist()
 
 
@@ -38,10 +39,11 @@ def operator_processor(column, operator_func, filter1, filter2):
 def grid_values(df, groupby_columns, selected_groups, aggregation_params, filter_model, sort_fields, sort_ascending, start_row, end_row):
     df = process_filters(df, filter_model)
     df, last_row = sort_and_aggregate(df, groupby_columns, selected_groups, aggregation_params, sort_fields, sort_ascending, start_row, end_row)
-    df = df[df.columns]
-    return {'rows': df.to_dict(orient='records'),
-            'lastRow': last_row
-            }
+
+    return {
+        'rows': df.to_dict(orient='records'),
+        'lastRow': last_row
+    }
 
 
 def sort_and_aggregate(df, groupby_columns, selected_groups, aggregation_params, sort_fields, sort_ascending, start_row, end_row):
@@ -69,8 +71,7 @@ def sort_and_aggregate(df, groupby_columns, selected_groups, aggregation_params,
                                ).index
 
             sorted_keys = sorted_keys[start_row:end_row]
-            df = df.loc[sorted_keys] #Filter out unneded groups
-
+            df = df.loc[sorted_keys] #Filter out unneded groups before aggregating
 
         df = df.groupby(level=0).agg(aggregation_params)
         if pagination:
