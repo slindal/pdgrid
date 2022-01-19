@@ -59,14 +59,16 @@ def sort_and_aggregate(df, request, response):
 
     if request.aggregation_group:
         df = df.set_index(request.aggregation_group)
-        last_row = df.index.nunique()
+
+        groups = df.groupby(request.aggregation_group)
+        last_row = groups.ngroups
 
         #Do we need to paginate or sort on non aggregated field? If so, paginate before aggregating all columns. Huge speed up in some cases!!
         if pagination := request.end_row < last_row or request.start_row > 0 or request.sort_agg_params:
 
             if not request.sort_fields or request.sort_fields[0] == request.aggregation_group:
                 #only sort by group by column
-                ascending = True if not request.sort_columns else request.sort_ascending[0]
+                ascending = True if not request.sort_fields else request.sort_ascending[0]
                 sorted_keys = df.index.drop_duplicates().sort_values(ascending=ascending)
             elif request.do_pivot:
                 pivot_sort_column = next(iter(request.sort_agg_params.keys()))
@@ -77,7 +79,7 @@ def sort_and_aggregate(df, request, response):
 
             else:    
                 agg_params = {**request.sort_agg_params, **{k:v for k,v in request.aggregation_params.items() if k in request.sort_fields}}
-                sorted_keys = (df.groupby(level=0)
+                sorted_keys = (groups
                                .agg(agg_params)
                                .sort_values(by=list(request.sort_columns.keys()),
                                             ascending=list(request.sort_columns.values()))
