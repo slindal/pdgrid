@@ -54,7 +54,7 @@ def test_text_filter_contains():
     }
 
     response = aggrid_values(df, request)
-    assert(response == {'rows': [{'a': 'aba', 'b': 'bba', 'c': 'cca'}, {'a': 'abb', 'b': 'baa', 'c': 'cbb'}], 'lastRow': 2})
+    assert(response == {'rows': [{'a': 'aba', 'b': 'bba', 'c': 'cca'}, {'a': 'abb', 'b': 'baa', 'c': 'cbb'}], 'lastRow': 2, 'secondaryColDefs': {}})
  
     
 def test_text_filter_not_contains():
@@ -75,7 +75,7 @@ def test_text_filter_not_contains():
     }
 
     response = aggrid_values(df, request)
-    assert(response == {'rows': [{'a': 'aaa', 'b': 'bbb', 'c': 'ccc'}], 'lastRow': 1})
+    assert(response == {'rows': [{'a': 'aaa', 'b': 'bbb', 'c': 'ccc'}], 'lastRow': 1, 'secondaryColDefs': {}})
 
  
 def test_text_filter_equals():
@@ -96,7 +96,7 @@ def test_text_filter_equals():
     }
 
     response = aggrid_values(df, request)
-    assert(response == {'rows': [{'a': 'abb', 'b': 'baa', 'c': 'cbb'}], 'lastRow': 1})
+    assert(response == {'rows': [{'a': 'abb', 'b': 'baa', 'c': 'cbb'}], 'lastRow': 1, 'secondaryColDefs': {}})
     
 def test_text_filter_not_equals():
     df = pandas.DataFrame(columns=['a', 'b', 'c'], data = [['aaa', 'bbb', 'ccc'],
@@ -116,7 +116,7 @@ def test_text_filter_not_equals():
     }
 
     response = aggrid_values(df, request)
-    assert(response == {'rows': [{'a': 'aaa', 'b': 'bbb', 'c': 'ccc'}, {'a': 'aba', 'b': 'bba', 'c': 'cca'}], 'lastRow': 2})
+    assert(response == {'rows': [{'a': 'aaa', 'b': 'bbb', 'c': 'ccc'}, {'a': 'aba', 'b': 'bba', 'c': 'cca'}], 'lastRow': 2, 'secondaryColDefs': {}})
 
     
 def test_text_filter_startwith():
@@ -137,7 +137,7 @@ def test_text_filter_startwith():
     }
 
     response = aggrid_values(df, request)
-    assert(response == {'rows': [{'a': 'aba', 'b': 'bba', 'c': 'cca'}, {'a': 'abb', 'b': 'baa', 'c': 'cbb'}], 'lastRow': 2})
+    assert(response == {'rows': [{'a': 'aba', 'b': 'bba', 'c': 'cca'}, {'a': 'abb', 'b': 'baa', 'c': 'cbb'}], 'lastRow': 2, 'secondaryColDefs': {}})
 
 def test_text_filter_endswith():
     df = pandas.DataFrame(columns=['a', 'b', 'c'], data = [['aaa', 'bbb', 'ccc'],
@@ -157,7 +157,7 @@ def test_text_filter_endswith():
     }
 
     response = aggrid_values(df, request)
-    assert(response == {'rows': [{'a': 'abb', 'b': 'baa', 'c': 'cbb'}], 'lastRow': 1})
+    assert(response == {'rows': [{'a': 'abb', 'b': 'baa', 'c': 'cbb'}], 'lastRow': 1, 'secondaryColDefs': {}})
 
 
 def test_multi_filter():
@@ -186,7 +186,7 @@ def test_multi_filter():
     }
 
     response = aggrid_values(df, request)
-    assert(response == {'rows': [{'a': 'aaa', 'b': 'bbb', 'c': 'ccc'}, {'a': 'aba', 'b': 'bba', 'c': 'cca'}], 'lastRow': 2})
+    assert(response == {'rows': [{'a': 'aaa', 'b': 'bbb', 'c': 'ccc'}, {'a': 'aba', 'b': 'bba', 'c': 'cca'}], 'lastRow': 2, 'secondaryColDefs': {}})
 
 
 
@@ -218,7 +218,7 @@ def test_number_filter():
     }
 
     response = aggrid_values(df, request)
-    assert(response == {"rows": [{"a": 21, "b": "bba", "c": "cca"}], "lastRow": 1})
+    assert(response == {"rows": [{"a": 21, "b": "bba", "c": "cca"}], "lastRow": 1, 'secondaryColDefs': {}})
 
     
 
@@ -245,4 +245,4 @@ def test_number_inRange_filter():
     }
 
     response = aggrid_values(df, request)
-    assert(response == {"rows": [{"a": 1, "b": "bbb", "c": "ccc"}, {"a": 2, "b": "bba", "c": "cca"}], "lastRow": 2})
+    assert(response == {"rows": [{"a": 1, "b": "bbb", "c": "ccc"}, {"a": 2, "b": "bba", "c": "cca"}], "lastRow": 2, 'secondaryColDefs': {}})

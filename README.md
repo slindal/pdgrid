@@ -1,6 +1,6 @@
-# This package provides a higly performant api for a grid front end to request transformed and aggregated data sets.
+# A higly performant back end for AG-Grid front end. 
 
-The api is written generically so that one server can handle multiple different data sets without any modifications beyond how the data is loaded from the database (or otherwise). It is built around handling the requests from an [ag-grid](https://www.ag-grid.com/) front end client, but could easily be generalized to handle requests from other front ends.
+This API is written to deliver fast responses to requests from a grid front end client on data sets that are too big to be effectively transformed on the front end. 
 
 The ag-grid endpoint takes a Pandas dataframe and the corresponding ag-grid request and performs the transformations to the dataframe specified in the request, returning a dictionary formatted as expected by ag-grid.
 
@@ -11,9 +11,7 @@ The source code is available [here](https://github.com/slindal/pdgrid/tree/main/
 When benchmarked against a purpose-built Java server PDGrid generally outperformed Java. In some cases by a large factor, depending on the size of the data set. Pandas is extremely performant when performing grouping, aggregation, filtering and sorting commands. The biggest bottleneck in most cases will be the loading of the data from db or otherwise. By caching the data in Apache Parquet format this can be speeded up significantly (see example [here](https://github.com/slindal/pdgrid/tree/main/examples)).
 
 ## Supported ag-grid features
-Pagination, Grouping, Sorting, Aggregrations, Asynchronous fetching of set filter values, Filtering (text, numbers, text sets. Not datetype at the moment), 
-
-Pivot support, Datetype filtering will be added next. 
+Pivoting, Pagination, Grouping, Sorting, Aggregrations, Filtering, Asynchronous fetching of set filter values.
 
 ## Requirements
 Python 3.8 or 3.9.
