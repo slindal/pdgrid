@@ -54,7 +54,7 @@ $ export FLASK_APP=server
 $ python -m flask run --port=8000
 ```
 
-If you have started up the front end client (follow readme here: https://github.com/shuheb/ag-grid-angular-laravel-mysql/blob/main/client/README.md) from the laravel example you should be able to see data at http://localhost:4200/
+If you have started up a front end client (follow [these steps](https://github.com/slindal/ag-grid-pd-grid-example#readme) you should be able to see the data set http://localhost:4000 
 
 ## Using other data
 No changes are necessary on the server side, beyond changing the function that loads the data from database or elsewhere. The front end client must be updated to handle any changes to the data set.
